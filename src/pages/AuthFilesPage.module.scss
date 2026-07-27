@@ -515,6 +515,19 @@
   background-image: linear-gradient(180deg, rgba(243, 244, 246, 0.08), transparent);
 }
 
+// FORK-ADDED: Kiro/Copilot quota cards
+.kiroCard {
+  background-image: linear-gradient(180deg, rgba(237, 233, 254, 0.08), transparent);
+}
+
+.copilotCard {
+  background-image: linear-gradient(180deg, rgba(240, 240, 240, 0.08), transparent);
+}
+
+.qoderCard {
+  background-image: linear-gradient(180deg, rgba(221, 247, 255, 0.08), transparent);
+}
+
 .quotaSection {
   display: flex;
   flex-direction: column;

@@ -16,6 +16,10 @@ export type AuthFileType =
   | 'xai'
   | 'iflow'
   | 'vertex'
+  // FORK-ADDED: Kiro/Copilot/Qoder quota
+  | 'kiro'
+  | 'github-copilot'
+  | 'qoder'
   | 'empty'
   | 'unknown';
 

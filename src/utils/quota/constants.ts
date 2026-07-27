@@ -46,6 +46,19 @@ export const TYPE_COLORS: Record<string, TypeColorSet> = {
     light: { bg: '#e4edfd', text: '#2b5fbc' },
     dark: { bg: '#1a3d80', text: '#89b3f7' },
   },
+  // FORK-ADDED: Kiro / GitHub Copilot badge colors
+  kiro: {
+    light: { bg: '#ede9fe', text: '#6d28d9' },
+    dark: { bg: '#4c1d95', text: '#c4b5fd' },
+  },
+  'github-copilot': {
+    light: { bg: '#f0f0f0', text: '#24292f' },
+    dark: { bg: '#24292f', text: '#d0d7de' },
+  },
+  qoder: {
+    light: { bg: '#ddf7ff', text: '#0369a1' },
+    dark: { bg: '#083d54', text: '#7dd3fc' },
+  },
   empty: {
     light: { bg: '#f5f5f5', text: '#616161' },
     dark: { bg: '#424242', text: '#bdbdbd' },
@@ -161,4 +174,31 @@ export const XAI_REQUEST_HEADERS = {
 export const XAI_API_REQUEST_HEADERS = {
   Authorization: 'Bearer $TOKEN$',
   accept: 'application/json',
+};
+
+// ============================================================================
+// FORK-ADDED: Kiro 和 Copilot 配额支持
+// ============================================================================
+
+// Kiro (AWS CodeWhisperer) API configuration
+export const KIRO_QUOTA_URL = 'https://codewhisperer.us-east-1.amazonaws.com';
+
+export const KIRO_REQUEST_HEADERS = {
+  'Content-Type': 'application/x-amz-json-1.0',
+  'x-amz-target': 'AmazonCodeWhispererService.GetUsageLimits',
+  Authorization: 'Bearer $TOKEN$',
+};
+
+export const KIRO_REQUEST_BODY = JSON.stringify({
+  origin: 'AI_EDITOR',
+  resourceType: 'AGENTIC_REQUEST',
+});
+
+// GitHub Copilot API configuration
+export const COPILOT_QUOTA_URL = 'https://api.github.com/copilot_internal/user';
+
+export const COPILOT_REQUEST_HEADERS = {
+  Authorization: 'Bearer $TOKEN$',
+  Accept: 'application/json',
+  'User-Agent': 'CLIProxyAPI',
 };

@@ -7,6 +7,9 @@ import type {
   CodexUsagePayload,
   KimiUsagePayload,
   XaiBillingPayload,
+  KiroQuotaPayload,
+  KiroQuotaErrorPayload,
+  CopilotQuotaPayload,
 } from '@/types';
 import { normalizeAuthIndex } from '@/utils/authIndex';
 
@@ -199,6 +202,61 @@ export function parseXaiBillingPayload(payload: unknown): XaiBillingPayload | nu
   }
   if (typeof payload === 'object') {
     return payload as XaiBillingPayload;
+  }
+  return null;
+}
+
+// ============================================================================
+// FORK-ADDED: Kiro 和 Copilot 配额支持
+// ============================================================================
+
+export function parseKiroQuotaPayload(payload: unknown): KiroQuotaPayload | null {
+  if (payload === undefined || payload === null) return null;
+  if (typeof payload === 'string') {
+    const trimmed = payload.trim();
+    if (!trimmed) return null;
+    try {
+      return JSON.parse(trimmed) as KiroQuotaPayload;
+    } catch {
+      return null;
+    }
+  }
+  if (typeof payload === 'object') {
+    return payload as KiroQuotaPayload;
+  }
+  return null;
+}
+
+export function parseKiroErrorPayload(payload: unknown): KiroQuotaErrorPayload | null {
+  if (payload === undefined || payload === null) return null;
+  if (typeof payload === 'string') {
+    const trimmed = payload.trim();
+    if (!trimmed) return null;
+    try {
+      return JSON.parse(trimmed) as KiroQuotaErrorPayload;
+    } catch {
+      return null;
+    }
+  }
+  if (typeof payload === 'object') {
+    return payload as KiroQuotaErrorPayload;
+  }
+  return null;
+}
+
+export function parseCopilotQuotaPayload(payload: unknown): CopilotQuotaPayload | null {
+  if (payload === undefined || payload === null) return null;
+  if (typeof payload === 'string') {
+    const trimmed = payload.trim();
+    if (!trimmed) return null;
+    try {
+      return JSON.parse(trimmed) as CopilotQuotaPayload;
+    } catch {
+      return null;
+    }
+  }
+  if (typeof payload === 'object') {
+    return payload as CopilotQuotaPayload;
   }
   return null;
 }

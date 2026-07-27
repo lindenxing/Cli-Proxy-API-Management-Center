@@ -25,7 +25,16 @@ export type AuthFileModelItem = {
 };
 export type AuthFileIconAsset = string | { light: string; dark: string };
 
-export type QuotaProviderType = 'antigravity' | 'claude' | 'codex' | 'kimi' | 'xai';
+export type QuotaProviderType =
+  | 'antigravity'
+  | 'claude'
+  | 'codex'
+  | 'kimi'
+  | 'xai'
+  // FORK-ADDED: Kiro/Copilot/Qoder quota
+  | 'kiro'
+  | 'github-copilot'
+  | 'qoder';
 export type OAuthConfigLoadError = 'loading' | 'unsupported' | 'load' | null;
 
 export const QUOTA_PROVIDER_TYPES = new Set<QuotaProviderType>([
@@ -34,6 +43,10 @@ export const QUOTA_PROVIDER_TYPES = new Set<QuotaProviderType>([
   'codex',
   'kimi',
   'xai',
+  // FORK-ADDED: Kiro/Copilot/Qoder quota
+  'kiro',
+  'github-copilot',
+  'qoder',
 ]);
 
 export const OAUTH_PROVIDER_PRESETS = [
@@ -115,6 +128,19 @@ export const TYPE_COLORS: Record<string, TypeColorSet> = {
   vertex: {
     light: { bg: '#e4edfd', text: '#2b5fbc' },
     dark: { bg: '#1a3d80', text: '#89b3f7' },
+  },
+  // FORK-ADDED: Kiro (紫罗兰) / GitHub Copilot (石墨灰)
+  kiro: {
+    light: { bg: '#ede9fe', text: '#6d28d9' },
+    dark: { bg: '#4c1d95', text: '#c4b5fd' },
+  },
+  'github-copilot': {
+    light: { bg: '#f0f0f0', text: '#24292f' },
+    dark: { bg: '#24292f', text: '#d0d7de' },
+  },
+  qoder: {
+    light: { bg: '#ddf7ff', text: '#0369a1' },
+    dark: { bg: '#083d54', text: '#7dd3fc' },
   },
   empty: {
     light: { bg: '#f5f5f5', text: '#616161' },

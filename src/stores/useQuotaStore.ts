@@ -9,6 +9,10 @@ import type {
   CodexQuotaState,
   KimiQuotaState,
   XaiQuotaState,
+  // FORK-ADDED: Kiro/Copilot/Qoder quota
+  KiroQuotaState,
+  CopilotQuotaState,
+  QoderQuotaState,
 } from '@/types';
 
 type QuotaUpdater<T> = T | ((prev: T) => T);
@@ -20,11 +24,19 @@ interface QuotaStoreState {
   codexQuota: Record<string, CodexQuotaState>;
   kimiQuota: Record<string, KimiQuotaState>;
   xaiQuota: Record<string, XaiQuotaState>;
+  // FORK-ADDED: Kiro/Copilot quota
+  kiroQuota: Record<string, KiroQuotaState>;
+  copilotQuota: Record<string, CopilotQuotaState>;
+  qoderQuota: Record<string, QoderQuotaState>;
   setAntigravityQuota: (updater: QuotaUpdater<Record<string, AntigravityQuotaState>>) => void;
   setClaudeQuota: (updater: QuotaUpdater<Record<string, ClaudeQuotaState>>) => void;
   setCodexQuota: (updater: QuotaUpdater<Record<string, CodexQuotaState>>) => void;
   setKimiQuota: (updater: QuotaUpdater<Record<string, KimiQuotaState>>) => void;
   setXaiQuota: (updater: QuotaUpdater<Record<string, XaiQuotaState>>) => void;
+  // FORK-ADDED: Kiro/Copilot quota
+  setKiroQuota: (updater: QuotaUpdater<Record<string, KiroQuotaState>>) => void;
+  setCopilotQuota: (updater: QuotaUpdater<Record<string, CopilotQuotaState>>) => void;
+  setQoderQuota: (updater: QuotaUpdater<Record<string, QoderQuotaState>>) => void;
   clearQuotaCache: () => void;
 }
 
@@ -42,6 +54,10 @@ export const useQuotaStore = create<QuotaStoreState>((set) => ({
   codexQuota: {},
   kimiQuota: {},
   xaiQuota: {},
+  // FORK-ADDED: Kiro/Copilot quota
+  kiroQuota: {},
+  copilotQuota: {},
+  qoderQuota: {},
   setAntigravityQuota: (updater) =>
     set((state) => ({
       antigravityQuota: resolveUpdater(updater, state.antigravityQuota),
@@ -62,6 +78,19 @@ export const useQuotaStore = create<QuotaStoreState>((set) => ({
     set((state) => ({
       xaiQuota: resolveUpdater(updater, state.xaiQuota),
     })),
+  // FORK-ADDED: Kiro/Copilot quota
+  setKiroQuota: (updater) =>
+    set((state) => ({
+      kiroQuota: resolveUpdater(updater, state.kiroQuota),
+    })),
+  setCopilotQuota: (updater) =>
+    set((state) => ({
+      copilotQuota: resolveUpdater(updater, state.copilotQuota),
+    })),
+  setQoderQuota: (updater) =>
+    set((state) => ({
+      qoderQuota: resolveUpdater(updater, state.qoderQuota),
+    })),
   clearQuotaCache: () =>
     set((state) => ({
       cacheGeneration: state.cacheGeneration + 1,
@@ -70,6 +99,10 @@ export const useQuotaStore = create<QuotaStoreState>((set) => ({
       codexQuota: {},
       kimiQuota: {},
       xaiQuota: {},
+      // FORK-ADDED: Kiro/Copilot quota
+      kiroQuota: {},
+      copilotQuota: {},
+      qoderQuota: {},
     })),
 }));
 

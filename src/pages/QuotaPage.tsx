@@ -14,6 +14,11 @@ import {
   CODEX_CONFIG,
   KIMI_CONFIG,
   XAI_CONFIG,
+  // FORK-ADDED: Kiro/Copilot quota
+  KIRO_CONFIG,
+  COPILOT_CONFIG,
+  // FORK-ADDED: Qoder quota
+  QODER_CONFIG,
 } from '@/components/quota';
 import type { AuthFileItem } from '@/types';
 import styles from './QuotaPage.module.scss';
@@ -83,6 +88,25 @@ export function QuotaPage() {
       />
       <QuotaSection
         config={KIMI_CONFIG}
+        files={files}
+        loading={loading}
+        disabled={disableControls}
+      />
+      {/* FORK-ADDED: Kiro/Copilot quota sections */}
+      <QuotaSection
+        config={KIRO_CONFIG}
+        files={files}
+        loading={loading}
+        disabled={disableControls}
+      />
+      <QuotaSection
+        config={COPILOT_CONFIG}
+        files={files}
+        loading={loading}
+        disabled={disableControls}
+      />
+      <QuotaSection
+        config={QODER_CONFIG}
         files={files}
         loading={loading}
         disabled={disableControls}

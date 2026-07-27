@@ -124,7 +124,15 @@ export function AuthFileCard(props: AuthFileCardProps) {
             ? styles.kimiCard
             : quotaType === 'xai'
               ? styles.xaiCard
-              : '';
+              : // FORK-ADDED: Kiro/Copilot quota
+                quotaType === 'kiro'
+                ? styles.kiroCard
+                : quotaType === 'github-copilot'
+                  ? styles.copilotCard
+                  : // FORK-ADDED: Qoder quota
+                    quotaType === 'qoder'
+                    ? styles.qoderCard
+                    : '';
 
   const rawAuthIndex = file['auth_index'] ?? file.authIndex;
   const authIndexKey = normalizeRecentRequestAuthIndex(rawAuthIndex);

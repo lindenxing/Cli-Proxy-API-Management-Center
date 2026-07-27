@@ -114,7 +114,11 @@
 .claudeGrid,
 .codexGrid,
 .kimiGrid,
-.xaiGrid {
+.xaiGrid,
+// FORK-ADDED: Kiro/Copilot quota
+.kiroGrid,
+.copilotGrid,
+.qoderGrid {
   display: grid;
   gap: $spacing-md;
   grid-template-columns: repeat(auto-fill, minmax(380px, 1fr));
@@ -235,6 +239,19 @@
 
 .xaiCard {
   background-image: linear-gradient(180deg, rgba(243, 244, 246, 0.22), rgba(243, 244, 246, 0));
+}
+
+// FORK-ADDED: Kiro/Copilot quota cards
+.kiroCard {
+  background-image: linear-gradient(180deg, rgba(237, 233, 254, 0.2), rgba(237, 233, 254, 0));
+}
+
+.copilotCard {
+  background-image: linear-gradient(180deg, rgba(240, 240, 240, 0.2), rgba(240, 240, 240, 0));
+}
+
+.qoderCard {
+  background-image: linear-gradient(180deg, rgba(221, 247, 255, 0.18), rgba(221, 247, 255, 0));
 }
 
 .quotaSection {

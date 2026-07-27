@@ -38,3 +38,20 @@ export function isDisabledAuthFile(file: AuthFileItem): boolean {
   if (typeof raw === 'string') return raw.trim().toLowerCase() === 'true';
   return false;
 }
+
+// ============================================================================
+// FORK-ADDED: Kiro 和 Copilot 配额支持
+// ============================================================================
+
+export function isKiroFile(file: AuthFileItem): boolean {
+  return resolveAuthProvider(file) === 'kiro';
+}
+
+export function isCopilotFile(file: AuthFileItem): boolean {
+  return resolveAuthProvider(file) === 'github-copilot';
+}
+
+// FORK-ADDED: Qoder quota support
+export function isQoderFile(file: AuthFileItem): boolean {
+  return resolveAuthProvider(file) === 'qoder';
+}
