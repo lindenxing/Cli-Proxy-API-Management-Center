@@ -1,0 +1,176 @@
+name: Upstream Sync
+
+# 每天自动检测上游 (router-for-me/Cli-Proxy-API-Management-Center) 更新并尝试合并。
+# - 合并成功:直接推送到 main,并触发 CI 构建
+# - 合并冲突:创建/更新一个 issue 列出冲突文件,等待手动处理(参考 docs/conflict-resolution/)
+
+on:
+  schedule:
+    - cron: '17 3 * * *' # 每天 UTC 03:17(北京时间 11:17)
+  workflow_dispatch: {}
+
+permissions:
+  contents: write
+  issues: write
+
+concurrency:
+  group: upstream-sync
+  cancel-in-progress: false
+
+env:
+  UPSTREAM_REPO: https://github.com/router-for-me/Cli-Proxy-API-Management-Center
+  UPSTREAM_BRANCH: main
+
+jobs:
+  sync:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout fork
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+          token: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Configure git
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+
+      - name: Fetch upstream
+        run: |
+          git remote add upstream "$UPSTREAM_REPO" || git remote set-url upstream "$UPSTREAM_REPO"
+          git fetch upstream "$UPSTREAM_BRANCH" --tags
+
+      - name: Check for new upstream commits
+        id: check
+        run: |
+          BEHIND=$(git rev-list --count HEAD..upstream/$UPSTREAM_BRANCH)
+          echo "behind=$BEHIND" >> "$GITHUB_OUTPUT"
+          echo "Upstream is $BEHIND commits ahead."
+
+      - name: Attempt merge
+        id: merge
+        if: steps.check.outputs.behind != '0'
+        run: |
+          set +e
+          git merge upstream/$UPSTREAM_BRANCH --no-edit -m "chore: merge upstream $(git rev-parse --short upstream/$UPSTREAM_BRANCH)"
+          MERGE_EXIT=$?
+          set -e
+          if [ $MERGE_EXIT -ne 0 ]; then
+            echo "conflict=true" >> "$GITHUB_OUTPUT"
+            git diff --name-only --diff-filter=U > /tmp/conflicts.txt
+            cat /tmp/conflicts.txt
+            git merge --abort
+          else
+            echo "conflict=false" >> "$GITHUB_OUTPUT"
+          fi
+
+      - name: Setup Bun (verify merged result)
+        if: steps.check.outputs.behind != '0' && steps.merge.outputs.conflict == 'false'
+        uses: oven-sh/setup-bun@v2
+        with:
+          bun-version: latest
+
+      - name: Verify merged result
+        id: verify
+        if: steps.check.outputs.behind != '0' && steps.merge.outputs.conflict == 'false'
+        continue-on-error: true
+        run: |
+          bun install --frozen-lockfile || bun install
+          bun run verify
+
+      - name: Push merge
+        if: steps.check.outputs.behind != '0' && steps.merge.outputs.conflict == 'false' && steps.verify.outcome == 'success'
+        run: git push origin HEAD
+
+      - name: Open issue on merge conflict
+        if: steps.check.outputs.behind != '0' && steps.merge.outputs.conflict == 'true'
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const fs = require('fs');
+            const conflicts = fs.existsSync('/tmp/conflicts.txt')
+              ? fs.readFileSync('/tmp/conflicts.txt', 'utf8').trim()
+              : '(unknown)';
+            const title = '🔀 Upstream sync conflict';
+            const body = [
+              '自动合并上游失败,存在冲突。请手动处理:',
+              '',
+              '```bash',
+              'git fetch upstream main',
+              'git merge upstream/main',
+              '# 按 docs/conflict-resolution/ 手册解决冲突',
+              'bun run verify',
+              'git push origin main',
+              '```',
+              '',
+              '## 冲突文件',
+              '```',
+              conflicts,
+              '```',
+              '',
+              '参考 `docs/conflict-resolution/README.md` 了解本 fork 的全部改动点。',
+            ].join('\n');
+            const { data: issues } = await github.rest.issues.listForRepo({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              state: 'open',
+              labels: 'upstream-sync',
+            });
+            if (issues.length > 0) {
+              await github.rest.issues.createComment({
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                issue_number: issues[0].number,
+                body,
+              });
+            } else {
+              await github.rest.issues.create({
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                title,
+                body,
+                labels: ['upstream-sync'],
+              });
+            }
+
+      - name: Open issue on verify failure
+        if: steps.check.outputs.behind != '0' && steps.merge.outputs.conflict == 'false' && steps.verify.outcome == 'failure'
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const title = '⚠️ Upstream sync merged cleanly but verify failed';
+            const body = [
+              '自动合并上游无文本冲突,但 `bun run verify` 失败(可能是语义冲突)。',
+              '合并未推送,请本地重现并修复:',
+              '',
+              '```bash',
+              'git fetch upstream main',
+              'git merge upstream/main',
+              'bun run verify',
+              '```',
+              '',
+              `Workflow run: ${context.serverUrl}/${context.repo.owner}/${context.repo.repo}/actions/runs/${context.runId}`,
+            ].join('\n');
+            const { data: issues } = await github.rest.issues.listForRepo({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              state: 'open',
+              labels: 'upstream-sync',
+            });
+            if (issues.length > 0) {
+              await github.rest.issues.createComment({
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                issue_number: issues[0].number,
+                body,
+              });
+            } else {
+              await github.rest.issues.create({
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                title,
+                body,
+                labels: ['upstream-sync'],
+              });
+            }
