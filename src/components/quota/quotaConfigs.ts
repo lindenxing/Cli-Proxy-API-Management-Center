@@ -2449,6 +2449,22 @@ const renderQoderItems = (
   const orgRemaining = normalizeNumberValue(
     usage.org_resource_remaining ?? usage.orgResourceRemaining
   );
+  const explicitPercent = normalizeNumberValue(usage.percentage);
+
+  // FORK-TWEAK: guard against empty/zero Qoder snapshots. When the backend has no
+  // real usage data (total/used/remaining all absent or 0 and no explicit percentage),
+  // avoid the contradictory "100% + 0/0 + quota exceeded" display.
+  const hasMeaningfulData =
+    explicitPercent !== null ||
+    (total !== null && total > 0) ||
+    (used !== null && used > 0) ||
+    (remainingAmount !== null && remainingAmount > 0) ||
+    (orgRemaining !== null && orgRemaining > 0);
+
+  if (!hasMeaningfulData) {
+    return h('div', { className: styleMap.quotaMessage }, t('qoder_quota.empty_data'));
+  }
+
   const usedPercent = normalizeQoderUsedPercent(usage);
   const remainingPercent =
     usedPercent === null ? null : Math.max(0, Math.min(100, 100 - usedPercent));
@@ -2456,7 +2472,7 @@ const renderQoderItems = (
   const resetLabel = formatQoderExpiry(usage.expires_at ?? usage.expiresAt);
   const isExceeded = normalizeQoderBooleanValue(usage.is_quota_exceeded ?? usage.isQuotaExceeded);
   const amountLabel =
-    used !== null && total !== null
+    used !== null && total !== null && total > 0
       ? `${formatQoderAmount(used)} / ${formatQoderAmount(total, unit)}`
       : remainingAmount !== null
         ? t('qoder_quota.remaining_amount', {
@@ -2494,7 +2510,7 @@ const renderQoderItems = (
     ),
   ];
 
-  if (orgRemaining !== null) {
+  if (orgRemaining !== null && orgRemaining > 0) {
     nodes.push(
       h(
         'div',

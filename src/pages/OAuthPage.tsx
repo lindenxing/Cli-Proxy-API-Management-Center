@@ -568,9 +568,11 @@ export function OAuthPage() {
     }
   };
 
-  const renderOAuthProviderCard = (provider: OAuthProviderCard, featured = false) => {
+  const renderOAuthProviderCard = (provider: OAuthProviderCard) => {
     const state = states[provider.id] || {};
-    const showKimiSignUp = featured && provider.kind === 'builtin' && provider.id === 'kimi';
+    // FORK-TWEAK: keep Kimi visually consistent with other OAuth cards,
+    // only retain its dedicated sign-up button.
+    const showKimiSignUp = provider.kind === 'builtin' && provider.id === 'kimi';
     const canSubmitCallback =
       (provider.kind === 'plugin' || CALLBACK_SUPPORTED.has(provider.id)) && Boolean(state.url);
     const loginButtonLabel =
@@ -588,7 +590,6 @@ export function OAuthPage() {
     return (
       <Card
         key={provider.id}
-        className={featured ? styles.featuredCard : undefined}
         title={
           <span className={styles.cardTitle}>
             <OAuthProviderIcon provider={provider} theme={resolvedTheme} />
@@ -615,7 +616,7 @@ export function OAuthPage() {
         }
       >
         <div className={styles.cardContent}>
-          <div className={featured ? styles.featuredHint : styles.cardHint}>
+          <div className={styles.cardHint}>
             {getProviderText(provider, 'oauth_hint')}
           </div>
           {state.url && (
@@ -716,14 +717,10 @@ export function OAuthPage() {
       <h1 className={styles.pageTitle}>{t('nav.oauth', { defaultValue: 'OAuth' })}</h1>
 
       <div className={styles.content}>
-        {featuredProvider && (
-          <section className={styles.providerSection}>
-            {renderOAuthProviderCard(featuredProvider, true)}
-          </section>
-        )}
-
+        {/* FORK-TWEAK: Kimi rendered in the same grid/style as other providers */}
         <section className={styles.providerSection}>
           <div className={styles.providerList}>
+            {featuredProvider && renderOAuthProviderCard(featuredProvider)}
             {otherOAuthProviders.map((provider) => renderOAuthProviderCard(provider))}
           </div>
         </section>
