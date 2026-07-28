@@ -510,7 +510,8 @@
     display: flex;
     flex-direction: column;
     min-width: 0;
-    line-height: 1.15;
+    // FORK-TWEAK: roomier line-height so descenders are not clipped
+    line-height: 1.3;
   }
 
   .sidebar-brand-title {
@@ -644,7 +645,8 @@
       display: flex;
       flex-direction: column;
       min-width: 0;
-      line-height: 1.2;
+      // FORK-TWEAK: roomier line-height so descenders (g/y/p) are not clipped
+      line-height: 1.4;
     }
 
     .nav-label {
