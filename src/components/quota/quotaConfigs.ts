@@ -36,12 +36,18 @@ import type {
   // FORK-ADDED: Qoder quota
   QoderQuotaState,
   QoderUsageSnapshot,
+  // FORK-ADDED: WorkBuddy/QoderWork plugin credits
+  PluginCreditsQuotaState,
+  PluginCreditsQuotaData,
 } from '@/types';
 import {
   antigravitySubscriptionApi,
   apiCallApi,
   authFilesApi,
   getApiCallErrorMessage,
+  // FORK-ADDED: WorkBuddy/QoderWork plugin credits
+  pluginCreditsApi,
+  type PluginCreditsPluginId,
   type AntigravitySubscriptionSummary,
 } from '@/services/api';
 import {
@@ -106,6 +112,9 @@ import {
   isKiroFile,
   isCopilotFile,
   isQoderFile,
+  // FORK-ADDED: WorkBuddy/QoderWork plugin credits
+  isWorkBuddyFile,
+  isQoderWorkFile,
 } from '@/utils/quota';
 import { normalizeAuthIndex } from '@/utils/authIndex';
 import { formatDateTimeValue } from '@/utils/format';
@@ -124,7 +133,10 @@ type QuotaType =
   | 'kiro'
   | 'github-copilot'
   // FORK-ADDED: Qoder quota
-  | 'qoder';
+  | 'qoder'
+  // FORK-ADDED: WorkBuddy/QoderWork plugin credits
+  | 'workbuddy'
+  | 'qoderwork';
 
 type AntigravityQuotaData = {
   groups: AntigravityQuotaGroup[];
@@ -162,6 +174,9 @@ export interface QuotaStore {
   kiroQuota: Record<string, KiroQuotaState>;
   copilotQuota: Record<string, CopilotQuotaState>;
   qoderQuota: Record<string, QoderQuotaState>;
+  // FORK-ADDED: WorkBuddy/QoderWork plugin credits
+  workbuddyQuota: Record<string, PluginCreditsQuotaState>;
+  qoderworkQuota: Record<string, PluginCreditsQuotaState>;
   setAntigravityQuota: (updater: QuotaUpdater<Record<string, AntigravityQuotaState>>) => void;
   setClaudeQuota: (updater: QuotaUpdater<Record<string, ClaudeQuotaState>>) => void;
   setCodexQuota: (updater: QuotaUpdater<Record<string, CodexQuotaState>>) => void;
@@ -171,6 +186,9 @@ export interface QuotaStore {
   setKiroQuota: (updater: QuotaUpdater<Record<string, KiroQuotaState>>) => void;
   setCopilotQuota: (updater: QuotaUpdater<Record<string, CopilotQuotaState>>) => void;
   setQoderQuota: (updater: QuotaUpdater<Record<string, QoderQuotaState>>) => void;
+  // FORK-ADDED: WorkBuddy/QoderWork plugin credits
+  setWorkbuddyQuota: (updater: QuotaUpdater<Record<string, PluginCreditsQuotaState>>) => void;
+  setQoderworkQuota: (updater: QuotaUpdater<Record<string, PluginCreditsQuotaState>>) => void;
   clearQuotaCache: () => void;
 }
 
@@ -2553,3 +2571,200 @@ export const QODER_CONFIG: QuotaConfig<QoderQuotaState, QoderUsageSnapshot> = {
   gridClassName: styles.qoderGrid,
   renderQuotaItems: renderQoderItems,
 };
+
+// ============================================================================
+// FORK-ADDED: WorkBuddy / QoderWork plugin credits (Sliverkiss/cpa-plugin)
+// ============================================================================
+
+const fetchPluginCreditsQuota = async (
+  pluginId: PluginCreditsPluginId,
+  file: AuthFileItem,
+  t: TFunction
+): Promise<PluginCreditsQuotaData> => {
+  const rawAuthIndex = file['auth_index'] ?? file.authIndex;
+  const authIndex = normalizeAuthIndex(rawAuthIndex);
+  if (!authIndex) {
+    throw new Error(t('plugin_credits_quota.missing_auth_index'));
+  }
+
+  const account = await pluginCreditsApi.getAccount(pluginId, authIndex);
+  const credits = account.credits ?? null;
+
+  return {
+    nickname: account.nickname ?? null,
+    plan: account.plan ?? null,
+    region: account.region ?? null,
+    exhausted: account.exhausted === true,
+    remain: credits?.total_remain ?? null,
+    used: credits?.total_used ?? null,
+    size: credits?.total_size ?? null,
+    fetchedAt: credits?.fetched_at ?? null,
+  };
+};
+
+const formatPluginCreditsFetchedAt = (value: string | null): string => {
+  if (!value) return '';
+  const date = new Date(value);
+  if (Number.isNaN(date.getTime())) return '';
+  return date.toLocaleString(undefined, {
+    month: '2-digit',
+    day: '2-digit',
+    hour: '2-digit',
+    minute: '2-digit',
+    hour12: false,
+  });
+};
+
+const renderPluginCreditsItems = (
+  quota: PluginCreditsQuotaState,
+  t: TFunction,
+  helpers: QuotaRenderHelpers
+): ReactNode => {
+  const { styles: styleMap, QuotaProgressBar } = helpers;
+  const { createElement: h, Fragment } = React;
+  const data = quota.data ?? null;
+
+  if (!data) {
+    return h('div', { className: styleMap.quotaMessage }, t('plugin_credits_quota.empty_data'));
+  }
+
+  const remain = data.remain ?? 0;
+  const used = data.used ?? 0;
+  // Pool: prefer size; fall back to remain+used. Check-in packs grow the pool.
+  const pool = data.size && data.size > 0 ? data.size : remain + used;
+  const hasSignal = remain > 0 || used > 0 || pool > 0;
+
+  const nodes: ReactNode[] = [];
+
+  const metaParts: ReactNode[] = [];
+  if (data.plan) {
+    metaParts.push(
+      h(
+        'span',
+        { key: 'plan', className: styleMap.codexPlanItem },
+        h('span', { className: styleMap.codexPlanLabel }, t('plugin_credits_quota.plan_label')),
+        h('span', { className: styleMap.codexPlanValue }, data.plan)
+      )
+    );
+  }
+  if (data.region) {
+    metaParts.push(
+      h(
+        'span',
+        { key: 'region', className: styleMap.codexPlanItem },
+        h('span', { className: styleMap.codexPlanLabel }, t('plugin_credits_quota.region_label')),
+        h('span', { className: styleMap.codexPlanValue }, data.region.toUpperCase())
+      )
+    );
+  }
+  if (metaParts.length > 0) {
+    nodes.push(h('div', { key: 'meta', className: styleMap.codexPlan }, ...metaParts));
+  }
+
+  if (!hasSignal) {
+    nodes.push(
+      h(
+        'div',
+        { key: 'empty', className: styleMap.quotaMessage },
+        t('plugin_credits_quota.empty_data')
+      )
+    );
+    return h(Fragment, null, ...nodes);
+  }
+
+  const percent = pool > 0 ? Math.max(0, Math.min(100, Math.round((remain / pool) * 100))) : 0;
+  const fetchedLabel = formatPluginCreditsFetchedAt(data.fetchedAt);
+
+  nodes.push(
+    h(
+      'div',
+      { key: 'credits', className: styleMap.quotaRow },
+      h(
+        'div',
+        { className: styleMap.quotaRowHeader },
+        h('span', { className: styleMap.quotaModel }, t('plugin_credits_quota.credits_label')),
+        h(
+          'div',
+          { className: styleMap.quotaMeta },
+          h('span', { className: styleMap.quotaPercent }, `${percent}%`),
+          h('span', { className: styleMap.quotaAmount }, `${remain} / ${pool}`),
+          fetchedLabel
+            ? h(
+                'span',
+                { className: styleMap.quotaReset },
+                t('plugin_credits_quota.fetched_at', { time: fetchedLabel })
+              )
+            : null
+        )
+      ),
+      h(QuotaProgressBar, {
+        percent,
+        highThreshold: QUOTA_PROGRESS_HIGH_THRESHOLD,
+        mediumThreshold: QUOTA_PROGRESS_MEDIUM_THRESHOLD,
+      })
+    )
+  );
+
+  if (data.exhausted) {
+    nodes.push(
+      h(
+        'div',
+        { key: 'exhausted', className: styleMap.quotaWarning },
+        t('plugin_credits_quota.exhausted')
+      )
+    );
+  }
+
+  return h(Fragment, null, ...nodes);
+};
+
+const buildPluginCreditsConfig = (
+  pluginId: PluginCreditsPluginId,
+  options: {
+    type: QuotaType;
+    i18nPrefix: string;
+    filterFn: (file: AuthFileItem) => boolean;
+    storeSelector: (state: QuotaStore) => Record<string, PluginCreditsQuotaState>;
+    storeSetter: keyof QuotaStore;
+    cardClassName: string;
+    gridClassName: string;
+  }
+): QuotaConfig<PluginCreditsQuotaState, PluginCreditsQuotaData> => ({
+  type: options.type,
+  i18nPrefix: options.i18nPrefix,
+  filterFn: options.filterFn,
+  fetchQuota: (file, t) => fetchPluginCreditsQuota(pluginId, file, t),
+  storeSelector: options.storeSelector,
+  storeSetter: options.storeSetter,
+  buildLoadingState: () => ({ status: 'loading', data: null }),
+  buildSuccessState: (data) => ({ status: 'success', data }),
+  buildErrorState: (message, status) => ({
+    status: 'error',
+    data: null,
+    error: message,
+    errorStatus: status,
+  }),
+  cardClassName: options.cardClassName,
+  gridClassName: options.gridClassName,
+  renderQuotaItems: renderPluginCreditsItems,
+});
+
+export const WORKBUDDY_CONFIG = buildPluginCreditsConfig('workbuddy', {
+  type: 'workbuddy',
+  i18nPrefix: 'workbuddy_quota',
+  filterFn: (file) => isWorkBuddyFile(file) && !isDisabledAuthFile(file),
+  storeSelector: (state) => state.workbuddyQuota,
+  storeSetter: 'setWorkbuddyQuota',
+  cardClassName: styles.workbuddyCard,
+  gridClassName: styles.workbuddyGrid,
+});
+
+export const QODERWORK_CONFIG = buildPluginCreditsConfig('qoderwork', {
+  type: 'qoderwork',
+  i18nPrefix: 'qoderwork_quota',
+  filterFn: (file) => isQoderWorkFile(file) && !isDisabledAuthFile(file),
+  storeSelector: (state) => state.qoderworkQuota,
+  storeSetter: 'setQoderworkQuota',
+  cardClassName: styles.qoderworkCard,
+  gridClassName: styles.qoderworkGrid,
+});

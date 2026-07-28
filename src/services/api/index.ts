@@ -12,5 +12,7 @@ export * from './logs';
 export * from './version';
 export * from './models';
 export * from './plugins';
+// FORK-ADDED: WorkBuddy/QoderWork plugin credits
+export * from './pluginCredits';
 export * from './transformers';
 export * from './vertex';

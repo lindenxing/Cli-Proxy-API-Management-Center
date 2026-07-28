@@ -60,6 +60,26 @@ Qoder 额度不发起 API 请求,直接读取认证文件里的 `usage` 快照
 (`QoderUsageSnapshot`),需要后端为 kaitranntt 的 CLIProxyAPI fork。
 文件清单已并入上表。
 
+## 三点五、WorkBuddy / QoderWork 插件积分(FORK-ADDED,对接 Sliverkiss/cpa-plugin)
+
+依赖后端安装对应插件(workbuddy / qoderwork),前端通过插件管理端点查询:
+`GET /v0/management/plugins/<id>/credits?auth_index=<idx>`。
+
+| 文件 | 改动 |
+|------|------|
+| `src/services/api/pluginCredits.ts` | **新文件**:pluginCreditsApi.getAccount(归一化 accounts[0]) |
+| `src/services/api/index.ts` | barrel 导出 pluginCredits |
+| `src/types/quota.ts` | 末尾追加 PluginCredits* 类型 |
+| `src/utils/quota/validators.ts` | isWorkBuddyFile / isQoderWorkFile(provider 或文件名前缀) |
+| `src/utils/quota/constants.ts` | TYPE_COLORS 增加 workbuddy/qoderwork |
+| `src/stores/useQuotaStore.ts` | workbuddyQuota / qoderworkQuota 状态槽 |
+| `src/components/quota/quotaConfigs.ts` | buildPluginCreditsConfig 工厂 + WORKBUDDY_CONFIG / QODERWORK_CONFIG(仅总览进度条,无分包明细) |
+| `src/pages/QuotaPage.tsx` | 追加两个 Section |
+| `src/pages/QuotaPage.module.scss` | workbuddyGrid/qoderworkGrid + 卡片渐变 |
+| `src/i18n/locales/*.json` | plugin_credits_quota / workbuddy_quota / qoderwork_quota 段 + filter 标签 |
+
+注意:未安装插件时 credits 端点 404 → 卡片显示错误;无认证文件时显示空状态卡片(按用户要求)。
+
 ## 四、上游同步流程
 
 ```bash

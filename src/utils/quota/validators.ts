@@ -55,3 +55,14 @@ export function isCopilotFile(file: AuthFileItem): boolean {
 export function isQoderFile(file: AuthFileItem): boolean {
   return resolveAuthProvider(file) === 'qoder';
 }
+
+// FORK-ADDED: WorkBuddy / QoderWork plugin credits support
+export function isWorkBuddyFile(file: AuthFileItem): boolean {
+  if (resolveAuthProvider(file) === 'workbuddy') return true;
+  return typeof file.name === 'string' && file.name.toLowerCase().startsWith('workbuddy-');
+}
+
+export function isQoderWorkFile(file: AuthFileItem): boolean {
+  if (resolveAuthProvider(file) === 'qoderwork') return true;
+  return typeof file.name === 'string' && file.name.toLowerCase().startsWith('qoderwork-');
+}

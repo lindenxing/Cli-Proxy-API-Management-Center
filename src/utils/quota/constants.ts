@@ -59,6 +59,15 @@ export const TYPE_COLORS: Record<string, TypeColorSet> = {
     light: { bg: '#ddf7ff', text: '#0369a1' },
     dark: { bg: '#083d54', text: '#7dd3fc' },
   },
+  // FORK-ADDED: WorkBuddy (腾讯蓝) / QoderWork (青绿) plugin credits badges
+  workbuddy: {
+    light: { bg: '#e0ecff', text: '#1d4ed8' },
+    dark: { bg: '#1e3a8a', text: '#93c5fd' },
+  },
+  qoderwork: {
+    light: { bg: '#dcfce7', text: '#15803d' },
+    dark: { bg: '#14532d', text: '#86efac' },
+  },
   empty: {
     light: { bg: '#f5f5f5', text: '#616161' },
     dark: { bg: '#424242', text: '#bdbdbd' },

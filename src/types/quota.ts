@@ -486,3 +486,59 @@ export interface QoderQuotaState {
   error?: string;
   errorStatus?: number;
 }
+
+// ============================================================================
+// FORK-ADDED: WorkBuddy / QoderWork plugin credits support (Sliverkiss/cpa-plugin)
+// ============================================================================
+
+export interface PluginCreditsPackage {
+  name?: string;
+  remain?: number;
+  used?: number;
+  size?: number;
+  cycle_start?: string;
+  cycle_end?: string;
+}
+
+export interface PluginCreditsSummary {
+  total_remain?: number;
+  total_used?: number;
+  total_size?: number;
+  pack_count?: number;
+  fetched_at?: string;
+  packages?: PluginCreditsPackage[];
+}
+
+/** Single account row from GET /plugins/<id>/credits?auth_index=... */
+export interface PluginCreditsAccount {
+  auth_index?: string;
+  nickname?: string;
+  uid?: string;
+  region?: string;
+  plan?: string;
+  disabled?: boolean;
+  exhausted?: boolean;
+  credits?: PluginCreditsSummary | null;
+  error?: string;
+}
+
+export interface PluginCreditsQuotaData {
+  nickname: string | null;
+  plan: string | null;
+  region: string | null;
+  exhausted: boolean;
+  remain: number | null;
+  used: number | null;
+  size: number | null;
+  fetchedAt: string | null;
+}
+
+export interface PluginCreditsQuotaState {
+  status: 'idle' | 'loading' | 'success' | 'error';
+  data: PluginCreditsQuotaData | null;
+  error?: string;
+  errorStatus?: number;
+}
+
+export type WorkBuddyQuotaState = PluginCreditsQuotaState;
+export type QoderWorkQuotaState = PluginCreditsQuotaState;

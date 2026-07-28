@@ -13,6 +13,8 @@ import type {
   KiroQuotaState,
   CopilotQuotaState,
   QoderQuotaState,
+  // FORK-ADDED: WorkBuddy/QoderWork plugin credits
+  PluginCreditsQuotaState,
 } from '@/types';
 
 type QuotaUpdater<T> = T | ((prev: T) => T);
@@ -28,6 +30,9 @@ interface QuotaStoreState {
   kiroQuota: Record<string, KiroQuotaState>;
   copilotQuota: Record<string, CopilotQuotaState>;
   qoderQuota: Record<string, QoderQuotaState>;
+  // FORK-ADDED: WorkBuddy/QoderWork plugin credits
+  workbuddyQuota: Record<string, PluginCreditsQuotaState>;
+  qoderworkQuota: Record<string, PluginCreditsQuotaState>;
   setAntigravityQuota: (updater: QuotaUpdater<Record<string, AntigravityQuotaState>>) => void;
   setClaudeQuota: (updater: QuotaUpdater<Record<string, ClaudeQuotaState>>) => void;
   setCodexQuota: (updater: QuotaUpdater<Record<string, CodexQuotaState>>) => void;
@@ -37,6 +42,9 @@ interface QuotaStoreState {
   setKiroQuota: (updater: QuotaUpdater<Record<string, KiroQuotaState>>) => void;
   setCopilotQuota: (updater: QuotaUpdater<Record<string, CopilotQuotaState>>) => void;
   setQoderQuota: (updater: QuotaUpdater<Record<string, QoderQuotaState>>) => void;
+  // FORK-ADDED: WorkBuddy/QoderWork plugin credits
+  setWorkbuddyQuota: (updater: QuotaUpdater<Record<string, PluginCreditsQuotaState>>) => void;
+  setQoderworkQuota: (updater: QuotaUpdater<Record<string, PluginCreditsQuotaState>>) => void;
   clearQuotaCache: () => void;
 }
 
@@ -58,6 +66,9 @@ export const useQuotaStore = create<QuotaStoreState>((set) => ({
   kiroQuota: {},
   copilotQuota: {},
   qoderQuota: {},
+  // FORK-ADDED: WorkBuddy/QoderWork plugin credits
+  workbuddyQuota: {},
+  qoderworkQuota: {},
   setAntigravityQuota: (updater) =>
     set((state) => ({
       antigravityQuota: resolveUpdater(updater, state.antigravityQuota),
@@ -91,6 +102,14 @@ export const useQuotaStore = create<QuotaStoreState>((set) => ({
     set((state) => ({
       qoderQuota: resolveUpdater(updater, state.qoderQuota),
     })),
+  setWorkbuddyQuota: (updater) =>
+    set((state) => ({
+      workbuddyQuota: resolveUpdater(updater, state.workbuddyQuota),
+    })),
+  setQoderworkQuota: (updater) =>
+    set((state) => ({
+      qoderworkQuota: resolveUpdater(updater, state.qoderworkQuota),
+    })),
   clearQuotaCache: () =>
     set((state) => ({
       cacheGeneration: state.cacheGeneration + 1,
@@ -103,6 +122,9 @@ export const useQuotaStore = create<QuotaStoreState>((set) => ({
       kiroQuota: {},
       copilotQuota: {},
       qoderQuota: {},
+      // FORK-ADDED: WorkBuddy/QoderWork plugin credits
+      workbuddyQuota: {},
+      qoderworkQuota: {},
     })),
 }));
 

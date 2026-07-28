@@ -19,6 +19,9 @@ import {
   COPILOT_CONFIG,
   // FORK-ADDED: Qoder quota
   QODER_CONFIG,
+  // FORK-ADDED: WorkBuddy/QoderWork plugin credits
+  WORKBUDDY_CONFIG,
+  QODERWORK_CONFIG,
 } from '@/components/quota';
 import type { AuthFileItem } from '@/types';
 import styles from './QuotaPage.module.scss';
@@ -107,6 +110,19 @@ export function QuotaPage() {
       />
       <QuotaSection
         config={QODER_CONFIG}
+        files={files}
+        loading={loading}
+        disabled={disableControls}
+      />
+      {/* FORK-ADDED: WorkBuddy/QoderWork plugin credits sections */}
+      <QuotaSection
+        config={WORKBUDDY_CONFIG}
+        files={files}
+        loading={loading}
+        disabled={disableControls}
+      />
+      <QuotaSection
+        config={QODERWORK_CONFIG}
         files={files}
         loading={loading}
         disabled={disableControls}

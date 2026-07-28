@@ -243,6 +243,8 @@
     "filter_kiro": "Kiro",
     "filter_github-copilot": "GitHub Copilot",
     "filter_qoder": "Qoder",
+    "filter_workbuddy": "WorkBuddy",
+    "filter_qoderwork": "QoderWork",
     "filter_empty": "Пусто",
     "filter_unknown": "Другое",
     "type_virtual": "Виртуальный файл авторизации",
@@ -497,6 +499,35 @@
     "expires_at": "Истекает {{time}}",
     "org_resource_remaining": "Остаток ресурсов организации",
     "quota_exceeded": "Квота превышена"
+  },
+  "plugin_credits_quota": {
+    "missing_auth_index": "В файле авторизации отсутствует auth_index",
+    "empty_data": "Нет данных о кредитах",
+    "plan_label": "План",
+    "region_label": "Регион",
+    "credits_label": "Кредиты",
+    "fetched_at": "Получено {{time}}",
+    "exhausted": "Кредиты исчерпаны"
+  },
+  "workbuddy_quota": {
+    "title": "Кредиты WorkBuddy",
+    "empty_title": "Нет аккаунтов WorkBuddy",
+    "empty_desc": "Установите плагин WorkBuddy и импортируйте учётные данные.",
+    "idle": "Нажмите здесь, чтобы обновить кредиты",
+    "loading": "Загрузка кредитов...",
+    "load_failed": "Не удалось загрузить кредиты: {{message}}",
+    "refresh_button": "Обновить кредиты",
+    "fetch_all": "Получить все"
+  },
+  "qoderwork_quota": {
+    "title": "Кредиты QoderWork",
+    "empty_title": "Нет аккаунтов QoderWork",
+    "empty_desc": "Установите плагин QoderWork и импортируйте учётные данные.",
+    "idle": "Нажмите здесь, чтобы обновить кредиты",
+    "loading": "Загрузка кредитов...",
+    "load_failed": "Не удалось загрузить кредиты: {{message}}",
+    "refresh_button": "Обновить кредиты",
+    "fetch_all": "Получить все"
   },
   "vertex_import": {
     "title": "Вход с Vertex JSON",

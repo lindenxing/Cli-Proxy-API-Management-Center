@@ -244,6 +244,8 @@
     "filter_kiro": "Kiro",
     "filter_github-copilot": "GitHub Copilot",
     "filter_qoder": "Qoder",
+    "filter_workbuddy": "WorkBuddy",
+    "filter_qoderwork": "QoderWork",
     "filter_empty": "空檔案",
     "filter_unknown": "其他",
     "type_virtual": "虛擬驗證檔案",
@@ -510,6 +512,35 @@
     "expires_at": "{{time}} 到期",
     "org_resource_remaining": "組織資源剩餘",
     "quota_exceeded": "額度已超限"
+  },
+  "plugin_credits_quota": {
+    "missing_auth_index": "驗證檔案缺少 auth_index",
+    "empty_data": "暫無積分資料",
+    "plan_label": "方案",
+    "region_label": "區域",
+    "credits_label": "積分",
+    "fetched_at": "{{time}} 取得",
+    "exhausted": "積分已耗盡"
+  },
+  "workbuddy_quota": {
+    "title": "WorkBuddy 積分",
+    "empty_title": "暫無 WorkBuddy 帳號",
+    "empty_desc": "安裝 WorkBuddy 外掛並匯入驗證後即可查看積分。",
+    "idle": "點擊此處重新整理積分",
+    "loading": "正在載入積分...",
+    "load_failed": "積分取得失敗：{{message}}",
+    "refresh_button": "重新整理積分",
+    "fetch_all": "取得全部"
+  },
+  "qoderwork_quota": {
+    "title": "QoderWork 積分",
+    "empty_title": "暫無 QoderWork 帳號",
+    "empty_desc": "安裝 QoderWork 外掛並匯入驗證後即可查看積分。",
+    "idle": "點擊此處重新整理積分",
+    "loading": "正在載入積分...",
+    "load_failed": "積分取得失敗：{{message}}",
+    "refresh_button": "重新整理積分",
+    "fetch_all": "取得全部"
   },
   "vertex_import": {
     "title": "Vertex JSON 登入",

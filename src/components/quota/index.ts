@@ -16,5 +16,8 @@ export {
   COPILOT_CONFIG,
   // FORK-ADDED: Qoder quota
   QODER_CONFIG,
+  // FORK-ADDED: WorkBuddy/QoderWork plugin credits
+  WORKBUDDY_CONFIG,
+  QODERWORK_CONFIG,
 } from './quotaConfigs';
 export type { QuotaConfig } from './quotaConfigs';
