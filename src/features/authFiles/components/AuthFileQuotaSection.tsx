@@ -10,8 +10,10 @@ import {
   // FORK-ADDED: Kiro/Copilot quota
   KIRO_CONFIG,
   COPILOT_CONFIG,
-  // FORK-ADDED: Qoder quota
+  // FORK-ADDED: Qoder quota (also hosts QoderWork plugin accounts)
   QODER_CONFIG,
+  // FORK-ADDED: WorkBuddy plugin credits
+  WORKBUDDY_CONFIG,
 } from '@/components/quota';
 import {
   captureQuotaCacheGeneration,
@@ -46,8 +48,11 @@ const getQuotaConfig = (type: QuotaProviderType) => {
   // FORK-ADDED: Kiro/Copilot quota
   if (type === 'kiro') return KIRO_CONFIG;
   if (type === 'github-copilot') return COPILOT_CONFIG;
-  // FORK-ADDED: Qoder quota
+  // FORK-ADDED: Qoder quota (QoderWork accounts share the same config)
   if (type === 'qoder') return QODER_CONFIG;
+  if (type === 'qoderwork') return QODER_CONFIG;
+  // FORK-ADDED: WorkBuddy plugin credits
+  if (type === 'workbuddy') return WORKBUDDY_CONFIG;
   return assertNever(type);
 };
 
@@ -73,8 +78,11 @@ export function AuthFileQuotaSection(props: AuthFileQuotaSectionProps) {
     // FORK-ADDED: Kiro/Copilot quota
     if (quotaType === 'kiro') return state.kiroQuota[file.name] as QuotaState;
     if (quotaType === 'github-copilot') return state.copilotQuota[file.name] as QuotaState;
-    // FORK-ADDED: Qoder quota
+    // FORK-ADDED: Qoder quota (QoderWork shares the qoder slot)
     if (quotaType === 'qoder') return state.qoderQuota[file.name] as QuotaState;
+    if (quotaType === 'qoderwork') return state.qoderQuota[file.name] as QuotaState;
+    // FORK-ADDED: WorkBuddy plugin credits
+    if (quotaType === 'workbuddy') return state.workbuddyQuota[file.name] as QuotaState;
     return assertNever(quotaType);
   });
 
@@ -90,8 +98,13 @@ export function AuthFileQuotaSection(props: AuthFileQuotaSectionProps) {
     if (quotaType === 'kiro') return state.setKiroQuota as unknown as (updater: unknown) => void;
     if (quotaType === 'github-copilot')
       return state.setCopilotQuota as unknown as (updater: unknown) => void;
-    // FORK-ADDED: Qoder quota
+    // FORK-ADDED: Qoder quota (QoderWork shares the qoder slot)
     if (quotaType === 'qoder') return state.setQoderQuota as unknown as (updater: unknown) => void;
+    if (quotaType === 'qoderwork')
+      return state.setQoderQuota as unknown as (updater: unknown) => void;
+    // FORK-ADDED: WorkBuddy plugin credits
+    if (quotaType === 'workbuddy')
+      return state.setWorkbuddyQuota as unknown as (updater: unknown) => void;
     return assertNever(quotaType);
   });
 

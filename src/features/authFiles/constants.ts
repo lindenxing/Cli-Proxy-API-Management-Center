@@ -34,7 +34,10 @@ export type QuotaProviderType =
   // FORK-ADDED: Kiro/Copilot/Qoder quota
   | 'kiro'
   | 'github-copilot'
-  | 'qoder';
+  | 'qoder'
+  // FORK-ADDED: WorkBuddy/QoderWork plugin credits
+  | 'workbuddy'
+  | 'qoderwork';
 export type OAuthConfigLoadError = 'loading' | 'unsupported' | 'load' | null;
 
 export const QUOTA_PROVIDER_TYPES = new Set<QuotaProviderType>([
@@ -47,6 +50,9 @@ export const QUOTA_PROVIDER_TYPES = new Set<QuotaProviderType>([
   'kiro',
   'github-copilot',
   'qoder',
+  // FORK-ADDED: WorkBuddy/QoderWork plugin credits
+  'workbuddy',
+  'qoderwork',
 ]);
 
 export const OAUTH_PROVIDER_PRESETS = [

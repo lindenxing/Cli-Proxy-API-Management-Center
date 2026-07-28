@@ -13,7 +13,7 @@ import {
 } from '@/components/ui/icons';
 import { ProviderStatusBar } from '@/components/providers/ProviderStatusBar';
 import type { AuthFileItem } from '@/types';
-import { resolveAuthProvider } from '@/utils/quota';
+import { resolveAuthProvider, isWorkBuddyFile, isQoderWorkFile } from '@/utils/quota';
 import {
   normalizeRecentRequestAuthIndex,
   normalizeRecentRequestBuckets,
@@ -65,8 +65,13 @@ export type AuthFileCardProps = {
 
 const resolveQuotaType = (file: AuthFileItem): QuotaProviderType | null => {
   const provider = resolveAuthProvider(file);
-  if (!QUOTA_PROVIDER_TYPES.has(provider as QuotaProviderType)) return null;
-  return provider as QuotaProviderType;
+  if (QUOTA_PROVIDER_TYPES.has(provider as QuotaProviderType)) {
+    return provider as QuotaProviderType;
+  }
+  // FORK-ADDED: plugin auth files may only be recognizable by filename prefix
+  if (isWorkBuddyFile(file)) return 'workbuddy';
+  if (isQoderWorkFile(file)) return 'qoderwork';
+  return null;
 };
 
 export function AuthFileCard(props: AuthFileCardProps) {
@@ -129,10 +134,13 @@ export function AuthFileCard(props: AuthFileCardProps) {
                 ? styles.kiroCard
                 : quotaType === 'github-copilot'
                   ? styles.copilotCard
-                  : // FORK-ADDED: Qoder quota
-                    quotaType === 'qoder'
+                  : // FORK-ADDED: Qoder quota (QoderWork shares the same tint)
+                    quotaType === 'qoder' || quotaType === 'qoderwork'
                     ? styles.qoderCard
-                    : '';
+                    : // FORK-ADDED: WorkBuddy plugin credits
+                      quotaType === 'workbuddy'
+                      ? styles.workbuddyCard
+                      : '';
 
   const rawAuthIndex = file['auth_index'] ?? file.authIndex;
   const authIndexKey = normalizeRecentRequestAuthIndex(rawAuthIndex);
