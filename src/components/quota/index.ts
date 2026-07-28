@@ -14,10 +14,9 @@ export {
   // FORK-ADDED: Kiro/Copilot quota
   KIRO_CONFIG,
   COPILOT_CONFIG,
-  // FORK-ADDED: Qoder quota
+  // FORK-ADDED: Qoder quota (also hosts QoderWork plugin accounts)
   QODER_CONFIG,
-  // FORK-ADDED: WorkBuddy/QoderWork plugin credits
+  // FORK-ADDED: WorkBuddy plugin credits
   WORKBUDDY_CONFIG,
-  QODERWORK_CONFIG,
 } from './quotaConfigs';
 export type { QuotaConfig } from './quotaConfigs';

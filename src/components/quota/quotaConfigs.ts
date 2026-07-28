@@ -174,9 +174,8 @@ export interface QuotaStore {
   kiroQuota: Record<string, KiroQuotaState>;
   copilotQuota: Record<string, CopilotQuotaState>;
   qoderQuota: Record<string, QoderQuotaState>;
-  // FORK-ADDED: WorkBuddy/QoderWork plugin credits
+  // FORK-ADDED: WorkBuddy plugin credits (QoderWork shares qoderQuota)
   workbuddyQuota: Record<string, PluginCreditsQuotaState>;
-  qoderworkQuota: Record<string, PluginCreditsQuotaState>;
   setAntigravityQuota: (updater: QuotaUpdater<Record<string, AntigravityQuotaState>>) => void;
   setClaudeQuota: (updater: QuotaUpdater<Record<string, ClaudeQuotaState>>) => void;
   setCodexQuota: (updater: QuotaUpdater<Record<string, CodexQuotaState>>) => void;
@@ -186,9 +185,8 @@ export interface QuotaStore {
   setKiroQuota: (updater: QuotaUpdater<Record<string, KiroQuotaState>>) => void;
   setCopilotQuota: (updater: QuotaUpdater<Record<string, CopilotQuotaState>>) => void;
   setQoderQuota: (updater: QuotaUpdater<Record<string, QoderQuotaState>>) => void;
-  // FORK-ADDED: WorkBuddy/QoderWork plugin credits
+  // FORK-ADDED: WorkBuddy plugin credits
   setWorkbuddyQuota: (updater: QuotaUpdater<Record<string, PluginCreditsQuotaState>>) => void;
-  setQoderworkQuota: (updater: QuotaUpdater<Record<string, PluginCreditsQuotaState>>) => void;
   clearQuotaCache: () => void;
 }
 
@@ -2066,39 +2064,42 @@ const renderKiroItems = (
 
   if (quota.freeTrialQuota) {
     const { used, limit, expiry, status } = quota.freeTrialQuota;
-    const remaining = Math.max(0, limit - used);
-    const percent = limit > 0 ? Math.round((remaining / limit) * 100) : 0;
     const isActive = status.toUpperCase() === 'ACTIVE';
-    const statusLabel = isActive ? t('kiro_quota.trial_active') : t('kiro_quota.trial_expired');
-    const expiryLabel = formatKiroResetTime(expiry);
+    // FORK-TWEAK: hide the free-trial row entirely once the trial has expired.
+    if (isActive) {
+      const remaining = Math.max(0, limit - used);
+      const percent = limit > 0 ? Math.round((remaining / limit) * 100) : 0;
+      const statusLabel = t('kiro_quota.trial_active');
+      const expiryLabel = formatKiroResetTime(expiry);
 
-    nodes.push(
-      h(
-        'div',
-        { key: 'trial', className: styleMap.quotaRow },
+      nodes.push(
         h(
           'div',
-          { className: styleMap.quotaRowHeader },
-          h(
-            'span',
-            { className: styleMap.quotaModel },
-            `${t('kiro_quota.free_trial')} (${statusLabel})`
-          ),
+          { key: 'trial', className: styleMap.quotaRow },
           h(
             'div',
-            { className: styleMap.quotaMeta },
-            h('span', { className: styleMap.quotaPercent }, `${percent}%`),
-            h('span', { className: styleMap.quotaAmount }, `${remaining.toFixed(1)}/${limit}`),
-            h('span', { className: styleMap.quotaReset }, expiryLabel)
-          )
-        ),
-        h(QuotaProgressBar, {
-          percent,
-          highThreshold: QUOTA_PROGRESS_HIGH_THRESHOLD,
-          mediumThreshold: QUOTA_PROGRESS_MEDIUM_THRESHOLD,
-        })
-      )
-    );
+            { className: styleMap.quotaRowHeader },
+            h(
+              'span',
+              { className: styleMap.quotaModel },
+              `${t('kiro_quota.free_trial')} (${statusLabel})`
+            ),
+            h(
+              'div',
+              { className: styleMap.quotaMeta },
+              h('span', { className: styleMap.quotaPercent }, `${percent}%`),
+              h('span', { className: styleMap.quotaAmount }, `${remaining.toFixed(1)}/${limit}`),
+              h('span', { className: styleMap.quotaReset }, expiryLabel)
+            )
+          ),
+          h(QuotaProgressBar, {
+            percent,
+            highThreshold: QUOTA_PROGRESS_HIGH_THRESHOLD,
+            mediumThreshold: QUOTA_PROGRESS_MEDIUM_THRESHOLD,
+          })
+        )
+      );
+    }
   }
 
   if (nodes.length === 0) {
@@ -2225,25 +2226,15 @@ const fetchCopilotQuota = async (file: AuthFileItem, t: TFunction): Promise<Copi
       });
     }
 
-    const completionsRemaining = normalizeNumberValue(payload.limited_user_quotas.completions) ?? 0;
-    const completionsLimit = normalizeNumberValue(payload.monthly_quotas.completions) ?? 0;
-    if (completionsLimit > 0) {
-      items.push({
-        id: 'completions',
-        label: t('copilot_quota.completions'),
-        used: completionsLimit - completionsRemaining,
-        limit: completionsLimit,
-        percent: Math.round((completionsRemaining / completionsLimit) * 100),
-        unlimited: false,
-      });
-    }
+    // FORK-TWEAK: Completions quota intentionally hidden.
   } else if (payload.quota_snapshots) {
     // Business/Enterprise subscription format
     resetDate = payload.quota_reset_date || null;
 
+    // FORK-TWEAK: Completions hidden unconditionally; Premium hidden when it
+    // has no entitlement (and is not unlimited).
     const snapshotKeys: Array<{ key: keyof CopilotQuotaSnapshots; labelKey: string }> = [
       { key: 'chat', labelKey: 'copilot_quota.chat' },
-      { key: 'completions', labelKey: 'copilot_quota.completions' },
       { key: 'premium_interactions', labelKey: 'copilot_quota.premium_interactions' },
     ];
 
@@ -2257,6 +2248,7 @@ const fetchCopilotQuota = async (file: AuthFileItem, t: TFunction): Promise<Copi
       const percentRemaining = normalizeNumberValue(snapshot.percent_remaining) ?? 0;
 
       if (unlimited && entitlement === 0 && remaining === 0) continue;
+      if (key === 'premium_interactions' && !unlimited && entitlement <= 0) continue;
 
       items.push({
         id: key,
@@ -2454,6 +2446,17 @@ const renderQoderItems = (
 ): ReactNode => {
   const { styles: styleMap, QuotaProgressBar } = helpers;
   const { createElement: h, Fragment } = React;
+
+  // FORK-TWEAK: QoderWork plugin accounts render via the shared plugin-credits
+  // renderer inside the unified Qoder section.
+  if (quota.credits) {
+    return renderPluginCreditsItems(
+      { status: quota.status, data: quota.credits, error: quota.error },
+      t,
+      helpers
+    );
+  }
+
   const usage = quota.usage ?? null;
 
   if (!usage) {
@@ -2552,18 +2555,35 @@ const renderQoderItems = (
   return h(Fragment, null, ...nodes);
 };
 
-export const QODER_CONFIG: QuotaConfig<QoderQuotaState, QoderUsageSnapshot> = {
+export const QODER_CONFIG: QuotaConfig<
+  QoderQuotaState,
+  { usage?: QoderUsageSnapshot | null; credits?: PluginCreditsQuotaData | null }
+> = {
   type: 'qoder',
   i18nPrefix: 'qoder_quota',
-  filterFn: (file) => isQoderFile(file) && !isDisabledAuthFile(file),
-  fetchQuota: fetchQoderQuota,
+  // FORK-TWEAK: the Qoder section also hosts QoderWork plugin accounts.
+  filterFn: (file) =>
+    (isQoderFile(file) || isQoderWorkFile(file)) && !isDisabledAuthFile(file),
+  fetchQuota: async (file, t) => {
+    if (isQoderWorkFile(file)) {
+      const credits = await fetchPluginCreditsQuota('qoderwork', file, t);
+      return { credits };
+    }
+    const usage = await fetchQoderQuota(file, t);
+    return { usage };
+  },
   storeSelector: (state) => state.qoderQuota,
   storeSetter: 'setQoderQuota',
-  buildLoadingState: () => ({ status: 'loading', usage: null }),
-  buildSuccessState: (usage) => ({ status: 'success', usage }),
+  buildLoadingState: () => ({ status: 'loading', usage: null, credits: null }),
+  buildSuccessState: (data) => ({
+    status: 'success',
+    usage: data.usage ?? null,
+    credits: data.credits ?? null,
+  }),
   buildErrorState: (message, status) => ({
     status: 'error',
     usage: null,
+    credits: null,
     error: message,
     errorStatus: status,
   }),
@@ -2759,12 +2779,5 @@ export const WORKBUDDY_CONFIG = buildPluginCreditsConfig('workbuddy', {
   gridClassName: styles.workbuddyGrid,
 });
 
-export const QODERWORK_CONFIG = buildPluginCreditsConfig('qoderwork', {
-  type: 'qoderwork',
-  i18nPrefix: 'qoderwork_quota',
-  filterFn: (file) => isQoderWorkFile(file) && !isDisabledAuthFile(file),
-  storeSelector: (state) => state.qoderworkQuota,
-  storeSetter: 'setQoderworkQuota',
-  cardClassName: styles.qoderworkCard,
-  gridClassName: styles.qoderworkGrid,
-});
+// FORK-TWEAK: QoderWork accounts are folded into QODER_CONFIG above;
+// no standalone QODERWORK_CONFIG section.

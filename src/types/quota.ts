@@ -483,6 +483,9 @@ export interface QoderUsageSnapshot {
 export interface QoderQuotaState {
   status: 'idle' | 'loading' | 'success' | 'error';
   usage?: QoderUsageSnapshot | null;
+  // FORK-TWEAK: QoderWork plugin accounts share the Qoder quota section;
+  // their credits summary is stored here instead of the usage snapshot.
+  credits?: PluginCreditsQuotaData | null;
   error?: string;
   errorStatus?: number;
 }

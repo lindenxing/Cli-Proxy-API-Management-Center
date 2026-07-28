@@ -119,8 +119,7 @@
 .kiroGrid,
 .copilotGrid,
 .qoderGrid,
-.workbuddyGrid,
-.qoderworkGrid {
+.workbuddyGrid {
   display: grid;
   gap: $spacing-md;
   grid-template-columns: repeat(auto-fill, minmax(380px, 1fr));
@@ -256,13 +255,9 @@
   background-image: linear-gradient(180deg, rgba(221, 247, 255, 0.18), rgba(221, 247, 255, 0));
 }
 
-// FORK-ADDED: WorkBuddy/QoderWork plugin credits cards
+// FORK-ADDED: WorkBuddy plugin credits card (QoderWork shares qoderCard)
 .workbuddyCard {
   background-image: linear-gradient(180deg, rgba(224, 236, 255, 0.2), rgba(224, 236, 255, 0));
-}
-
-.qoderworkCard {
-  background-image: linear-gradient(180deg, rgba(220, 252, 231, 0.2), rgba(220, 252, 231, 0));
 }
 
 .quotaSection {

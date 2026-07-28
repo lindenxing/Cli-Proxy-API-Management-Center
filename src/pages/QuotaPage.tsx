@@ -17,11 +17,10 @@ import {
   // FORK-ADDED: Kiro/Copilot quota
   KIRO_CONFIG,
   COPILOT_CONFIG,
-  // FORK-ADDED: Qoder quota
+  // FORK-ADDED: Qoder quota (also hosts QoderWork plugin accounts)
   QODER_CONFIG,
-  // FORK-ADDED: WorkBuddy/QoderWork plugin credits
+  // FORK-ADDED: WorkBuddy plugin credits
   WORKBUDDY_CONFIG,
-  QODERWORK_CONFIG,
 } from '@/components/quota';
 import type { AuthFileItem } from '@/types';
 import styles from './QuotaPage.module.scss';
@@ -114,15 +113,9 @@ export function QuotaPage() {
         loading={loading}
         disabled={disableControls}
       />
-      {/* FORK-ADDED: WorkBuddy/QoderWork plugin credits sections */}
+      {/* FORK-ADDED: WorkBuddy plugin credits section (QoderWork lives inside Qoder above) */}
       <QuotaSection
         config={WORKBUDDY_CONFIG}
-        files={files}
-        loading={loading}
-        disabled={disableControls}
-      />
-      <QuotaSection
-        config={QODERWORK_CONFIG}
         files={files}
         loading={loading}
         disabled={disableControls}
