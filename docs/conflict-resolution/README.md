@@ -22,7 +22,7 @@
 |------|------|-----------|
 | `src/router/MainRoutes.tsx` | `/quick-start` 路由改为重定向到 `/ai-providers` | 保留我们的重定向,删除上游对 `ProvidersWorkbenchPage fixedBrand="apikeyFun"` 的引用 |
 | `src/components/layout/MainLayout.tsx` | 删除 quickStartNavItem、IconSidebarQuickStart 导入、`config` 订阅 | 上游若改 navGroups 结构,取上游结构后再删 quickStart 项 |
-| `src/pages/DashboardPage.tsx` | 删除快速开始 bento 卡片及相关导入 | 取上游后删除 `quick_start_card` 卡片块 |
+| `src/features/dashboard/DashboardPage.tsx` | 上游 v1.20.0 起仪表盘迁至 `src/features/dashboard/`(旧 `src/pages/DashboardPage.tsx` 已删)。当前上游仪表盘不含赞助商广告,直接采用上游版本即可 | 若上游仪表盘重新引入 quick-start/apikeyFun 卡片,再按 FORK-REMOVED 方式删除 |
 | `src/features/providers/ProvidersWorkbenchPage.tsx` | 删除 SponsorQuickStartPanel 分支、quickStartResource、headerTitle 特判 | 取上游后按 FORK-REMOVED 标记重删 |
 | `src/features/providers/components/ProviderCategoryList.tsx` | 快速填充 aside 删除;赞助商品牌只在已配置时出现在普通列表 | 保留我们的 `providerGroups` 过滤逻辑 |
 | `src/features/providers/components/ProviderResourcePanel.tsx` | 删除全部 affiliate/dashboard 链接与相关导入 | 取上游后重删推广链接 JSX |
