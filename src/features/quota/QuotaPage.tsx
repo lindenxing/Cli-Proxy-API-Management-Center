@@ -111,6 +111,11 @@ export function QuotaPage() {
   const codexQuota = useQuotaStore((state) => state.codexQuota);
   const kimiQuota = useQuotaStore((state) => state.kimiQuota);
   const xaiQuota = useQuotaStore((state) => state.xaiQuota);
+  // FORK-ADDED: Kiro/Copilot/Qoder/WorkBuddy quota
+  const kiroQuota = useQuotaStore((state) => state.kiroQuota);
+  const copilotQuota = useQuotaStore((state) => state.copilotQuota);
+  const qoderQuota = useQuotaStore((state) => state.qoderQuota);
+  const workbuddyQuota = useQuotaStore((state) => state.workbuddyQuota);
 
   const quotaByType = useMemo<Record<QuotaProviderType, Record<string, QuotaCardState>>>(
     () =>
@@ -120,8 +125,23 @@ export function QuotaPage() {
         codex: codexQuota,
         kimi: kimiQuota,
         xai: xaiQuota,
+        // FORK-ADDED: Kiro/Copilot/Qoder/WorkBuddy quota
+        kiro: kiroQuota,
+        'github-copilot': copilotQuota,
+        qoder: qoderQuota,
+        workbuddy: workbuddyQuota,
       }) as unknown as Record<QuotaProviderType, Record<string, QuotaCardState>>,
-    [antigravityQuota, claudeQuota, codexQuota, kimiQuota, xaiQuota]
+    [
+      antigravityQuota,
+      claudeQuota,
+      codexQuota,
+      kimiQuota,
+      xaiQuota,
+      kiroQuota,
+      copilotQuota,
+      qoderQuota,
+      workbuddyQuota,
+    ]
   );
 
   const getQuota = useCallback(

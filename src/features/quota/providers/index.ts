@@ -21,6 +21,14 @@ import { KIMI_CONFIG } from './kimi/data';
 import { KimiQuotaBody } from './kimi/KimiQuotaBody';
 import { XAI_CONFIG } from './xai/data';
 import { XaiQuotaBody } from './xai/XaiQuotaBody';
+// FORK-ADDED: Kiro/Copilot/Qoder/WorkBuddy quota
+import { KIRO_CONFIG } from './kiro/data';
+import { KiroQuotaBody } from './kiro/KiroQuotaBody';
+import { COPILOT_CONFIG } from './copilot/data';
+import { CopilotQuotaBody } from './copilot/CopilotQuotaBody';
+import { QODER_CONFIG } from './qoder/data';
+import { QoderQuotaBody } from './qoder/QoderQuotaBody';
+import { WORKBUDDY_CONFIG, WorkBuddyQuotaBody } from './workbuddy/data';
 
 /** 所有 provider 额度状态的公共骨架（各 *QuotaState 的结构子集）。 */
 export interface QuotaCardState {
@@ -53,6 +61,11 @@ export const QUOTA_ADAPTERS: Record<QuotaProviderType, QuotaAdapter> = {
   codex: { ...CODEX_CONFIG, Body: CodexQuotaBody } as unknown as QuotaAdapter,
   kimi: { ...KIMI_CONFIG, Body: KimiQuotaBody } as unknown as QuotaAdapter,
   xai: { ...XAI_CONFIG, Body: XaiQuotaBody } as unknown as QuotaAdapter,
+  // FORK-ADDED: Kiro/Copilot/Qoder/WorkBuddy quota
+  kiro: { ...KIRO_CONFIG, Body: KiroQuotaBody } as unknown as QuotaAdapter,
+  'github-copilot': { ...COPILOT_CONFIG, Body: CopilotQuotaBody } as unknown as QuotaAdapter,
+  qoder: { ...QODER_CONFIG, Body: QoderQuotaBody } as unknown as QuotaAdapter,
+  workbuddy: { ...WORKBUDDY_CONFIG, Body: WorkBuddyQuotaBody } as unknown as QuotaAdapter,
 };
 
 export type QuotaMapUpdater = (

@@ -13,11 +13,26 @@ import type {
   CodexQuotaState,
   KimiQuotaState,
   XaiQuotaState,
+  // FORK-ADDED: Kiro/Copilot/Qoder/WorkBuddy quota
+  KiroQuotaState,
+  CopilotQuotaState,
+  QoderQuotaState,
+  PluginCreditsQuotaState,
 } from '@/types';
 
 export type QuotaUpdater<T> = T | ((prev: T) => T);
 
-export type QuotaProviderType = 'antigravity' | 'claude' | 'codex' | 'kimi' | 'xai';
+export type QuotaProviderType =
+  | 'antigravity'
+  | 'claude'
+  | 'codex'
+  | 'kimi'
+  | 'xai'
+  // FORK-ADDED: Kiro/Copilot/Qoder/WorkBuddy quota
+  | 'kiro'
+  | 'github-copilot'
+  | 'qoder'
+  | 'workbuddy';
 
 /** useQuotaStore 的结构契约（storeSelector/storeSetter 依赖）。 */
 export interface QuotaStore {
@@ -26,11 +41,21 @@ export interface QuotaStore {
   codexQuota: Record<string, CodexQuotaState>;
   kimiQuota: Record<string, KimiQuotaState>;
   xaiQuota: Record<string, XaiQuotaState>;
+  // FORK-ADDED: Kiro/Copilot/Qoder/WorkBuddy quota
+  kiroQuota: Record<string, KiroQuotaState>;
+  copilotQuota: Record<string, CopilotQuotaState>;
+  qoderQuota: Record<string, QoderQuotaState>;
+  workbuddyQuota: Record<string, PluginCreditsQuotaState>;
   setAntigravityQuota: (updater: QuotaUpdater<Record<string, AntigravityQuotaState>>) => void;
   setClaudeQuota: (updater: QuotaUpdater<Record<string, ClaudeQuotaState>>) => void;
   setCodexQuota: (updater: QuotaUpdater<Record<string, CodexQuotaState>>) => void;
   setKimiQuota: (updater: QuotaUpdater<Record<string, KimiQuotaState>>) => void;
   setXaiQuota: (updater: QuotaUpdater<Record<string, XaiQuotaState>>) => void;
+  // FORK-ADDED: Kiro/Copilot/Qoder/WorkBuddy quota
+  setKiroQuota: (updater: QuotaUpdater<Record<string, KiroQuotaState>>) => void;
+  setCopilotQuota: (updater: QuotaUpdater<Record<string, CopilotQuotaState>>) => void;
+  setQoderQuota: (updater: QuotaUpdater<Record<string, QoderQuotaState>>) => void;
+  setWorkbuddyQuota: (updater: QuotaUpdater<Record<string, PluginCreditsQuotaState>>) => void;
   clearQuotaCache: () => void;
 }
 

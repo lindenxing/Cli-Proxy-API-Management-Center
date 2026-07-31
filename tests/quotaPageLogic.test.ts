@@ -55,6 +55,11 @@ describe('buildTabCounts', () => {
       codex: 2,
       xai: 1,
       kimi: 1,
+      // FORK-ADDED: Kiro/Copilot/Qoder/WorkBuddy quota tabs (zero-filled)
+      kiro: 0,
+      'github-copilot': 0,
+      qoder: 0,
+      workbuddy: 0,
     });
   });
 });

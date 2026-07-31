@@ -54,6 +54,44 @@ i18n 中相关键(`nav.quick_start`、`dashboard.quick_start_*`、`providersPage
 冲突解决通用原则:**改动都在文件末尾或 switch/映射的追加分支**。
 上游改了同一文件时,先接受上游版本,再按 FORK-ADDED 标记把我们的追加块补回去。
 
+## ⚠️ 上游 v1.21.2 额度系统大重构(2026-07-31,已适配)
+
+上游把额度系统从 `src/components/quota/`(单文件 `quotaConfigs.ts` + `renderQuotaItems`
+手写 `h()` 渲染)整体迁移到 `src/features/quota/` 的**每 provider 一目录**新架构。
+旧 `components/quota/` 目录已被上游删除。我们的 5 个定制 provider 已按新架构重写:
+
+**新架构约定**:
+- `src/features/quota/providers/<name>/data.ts` — React-free 数据层,导出
+  `<NAME>_CONFIG: QuotaProviderData<TState, TData>`(无 cardClassName/gridClassName/renderQuotaItems)
+- `src/features/quota/providers/<name>/<Name>QuotaBody.tsx` — 渲染组件,
+  props = `QuotaBodyProps<TState>` = `{ quota, classes }`,用 `<div className={classes.quotaRow}>`
+  + `<QuotaMeter percent classes />`(替代旧 `QuotaProgressBar`)
+- `providers/index.ts` — 组装 `QUOTA_ADAPTERS: Record<QuotaProviderType, QuotaAdapter>`
+- `providers/types.ts` — `QuotaProviderType` 联合类型 + `QuotaStore` 接口
+- `QuotaClassMap` **无 quotaWarning 类**:耗尽/超限提示改用 `quotaMessage`
+
+**我们新增的文件**(FORK-ADDED):
+| 文件 | 说明 |
+|------|------|
+| `src/features/quota/providers/kiro/{data.ts,KiroQuotaBody.tsx}` | Kiro,过期 trial 隐藏 |
+| `src/features/quota/providers/copilot/{data.ts,CopilotQuotaBody.tsx}` | Copilot,隐藏 Completions/空 Premium |
+| `src/features/quota/providers/qoder/{data.ts,QoderQuotaBody.tsx}` | Qoder + QoderWork(credits 分支复用 PluginCreditsBody) |
+| `src/features/quota/providers/workbuddy/data.ts` | WorkBuddy(复用 pluginCredits/ 共享层) |
+| `src/features/quota/providers/pluginCredits/{shared.ts,PluginCreditsBody.tsx}` | 插件积分共享数据/渲染 |
+
+**接线点**(上游同一文件冲突时按此补回):
+- `providers/types.ts` — `QuotaProviderType` + `QuotaStore` 加 kiro/github-copilot/qoder/workbuddy
+- `providers/index.ts` — import + `QUOTA_ADAPTERS` 注册 4 条
+- `constants.ts` — `QUOTA_TAB_ORDER` 追加 4 个
+- `logic.ts` — `QUOTA_FILTER_MAP` 追加 4 条
+- `QuotaPage.tsx` — `quotaByType` useStore 订阅 + map 追加 4 条
+- `authFiles/constants.ts` — `QuotaProviderType`/`QUOTA_PROVIDER_TYPES` 追加 4 个
+- `authFiles/components/AuthFileQuotaSection.tsx` — quota selector 追加 4 分支
+- `authFiles/components/AuthFileCard.tsx` — resolveQuotaType 文件名前缀兜底(workbuddy/qoderwork→qoder)
+- `tests/quotaPageLogic.test.ts` — buildTabCounts 期望补 4 个 zero-fill 键
+- 底层保留:`utils/quota/{validators,constants,parsers}.ts`、`types/quota.ts`、
+  `stores/useQuotaStore.ts`、`services/api/pluginCredits.ts`、i18n 5 段文案(均自动合并保留)
+
 ## 三、Qoder 额度(FORK-ADDED,移植自 kaitranntt fork)
 
 Qoder 额度不发起 API 请求,直接读取认证文件里的 `usage` 快照

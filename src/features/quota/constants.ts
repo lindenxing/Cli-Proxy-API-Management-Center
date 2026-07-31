@@ -7,6 +7,11 @@ export const QUOTA_TAB_ORDER: readonly QuotaProviderType[] = [
   'codex',
   'xai',
   'kimi',
+  // FORK-ADDED: Kiro/Copilot/Qoder/WorkBuddy quota
+  'kiro',
+  'github-copilot',
+  'qoder',
+  'workbuddy',
 ];
 
 export type QuotaTabId = 'all' | QuotaProviderType;

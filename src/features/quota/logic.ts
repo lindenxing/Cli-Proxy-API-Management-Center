@@ -9,6 +9,11 @@ import { CLAUDE_CONFIG } from './providers/claude/data';
 import { CODEX_CONFIG } from './providers/codex/data';
 import { KIMI_CONFIG } from './providers/kimi/data';
 import { XAI_CONFIG } from './providers/xai/data';
+// FORK-ADDED: Kiro/Copilot/Qoder/WorkBuddy quota
+import { KIRO_CONFIG } from './providers/kiro/data';
+import { COPILOT_CONFIG } from './providers/copilot/data';
+import { QODER_CONFIG } from './providers/qoder/data';
+import { WORKBUDDY_CONFIG } from './providers/workbuddy/data';
 import type { QuotaProviderType } from './providers/types';
 import { QUOTA_TAB_ORDER, type QuotaTabId } from './constants';
 
@@ -18,6 +23,11 @@ const QUOTA_FILTER_MAP: Record<QuotaProviderType, (file: AuthFileItem) => boolea
   codex: CODEX_CONFIG.filterFn,
   kimi: KIMI_CONFIG.filterFn,
   xai: XAI_CONFIG.filterFn,
+  // FORK-ADDED: Kiro/Copilot/Qoder/WorkBuddy quota
+  kiro: KIRO_CONFIG.filterFn,
+  'github-copilot': COPILOT_CONFIG.filterFn,
+  qoder: QODER_CONFIG.filterFn,
+  workbuddy: WORKBUDDY_CONFIG.filterFn,
 };
 
 export interface QuotaFileEntry {
