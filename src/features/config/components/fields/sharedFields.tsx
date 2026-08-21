@@ -9,7 +9,6 @@ import type { VisualConfigValues } from '@/types/visualConfig';
 // FORK-REMOVED: sponsor imports
 import { ApiKeysCardEditor } from '../blocks/ApiKeysCardEditor';
 import { FieldAnchor, FieldGroup, ToggleRow } from './FieldPrimitives';
-import fieldStyles from './Field.module.scss';
 
 export type SharedFieldProps = {
   values: VisualConfigValues;
