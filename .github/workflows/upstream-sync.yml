@@ -1,7 +1,7 @@
 name: Upstream Sync
 
 # 每天自动检测上游 (router-for-me/Cli-Proxy-API-Management-Center) 更新并尝试合并。
-# - 合并成功:直接推送到 main,并触发 CI 构建
+# - 合并成功:直接推送到 main,自动打 fork tag 触发 Release 发布,并触发 CI 构建
 # - 合并冲突:创建/更新一个 issue 列出冲突文件,等待手动处理(参考 docs/conflict-resolution/)
 
 on:
@@ -82,6 +82,40 @@ jobs:
       - name: Push merge
         if: steps.check.outputs.behind != '0' && steps.merge.outputs.conflict == 'false' && steps.verify.outcome == 'success'
         run: git push origin HEAD
+
+      # 自动发布:合并成功后,取上游最新版本 tag,为 fork 创建对应的 -fork.N tag。
+      # tag 推送会触发 release.yml 自动构建并发布 Release(含 management.html)。
+      - name: Tag fork release
+        id: tag
+        if: steps.check.outputs.behind != '0' && steps.merge.outputs.conflict == 'false' && steps.verify.outcome == 'success'
+        run: |
+          set -euo pipefail
+          # 取上游(刚 fetch 进来的)最新版本 tag,只认合并进来的 upstream/main 上真实存在的
+          UPSTREAM_TAG="$(git tag --list 'v*' --sort=-v:refname --merged upstream/$UPSTREAM_BRANCH | head -n 1 || true)"
+          if [ -z "$UPSTREAM_TAG" ]; then
+            echo "No upstream version tag found; skipping fork release tag."
+            echo "created=false" >> "$GITHUB_OUTPUT"
+            exit 0
+          fi
+          echo "Upstream latest tag: $UPSTREAM_TAG"
+
+          # fork tag 命名: <upstream>-fork.N,N 取已有同前缀最大值 + 1
+          BASE="${UPSTREAM_TAG}-fork"
+          LAST_N="$(git tag --list "${BASE}.*" | sed -n "s/^${BASE}\.\([0-9]*\)$/\1/p" | sort -n | tail -n 1 || true)"
+          NEXT_N=$(( ${LAST_N:-0} + 1 ))
+          FORK_TAG="${BASE}.${NEXT_N}"
+
+          if git rev-parse -q --verify "refs/tags/${FORK_TAG}" >/dev/null; then
+            echo "Tag ${FORK_TAG} already exists; skipping."
+            echo "created=false" >> "$GITHUB_OUTPUT"
+            exit 0
+          fi
+
+          git tag -a "$FORK_TAG" -m "Fork release ${FORK_TAG} (based on upstream ${UPSTREAM_TAG})"
+          git push origin "$FORK_TAG"
+          echo "created=true" >> "$GITHUB_OUTPUT"
+          echo "fork_tag=${FORK_TAG}" >> "$GITHUB_OUTPUT"
+          echo "Fork release tag pushed: $FORK_TAG"
 
       - name: Open issue on merge conflict
         if: steps.check.outputs.behind != '0' && steps.merge.outputs.conflict == 'true'
