@@ -91,7 +91,7 @@ export function ProviderResourcePanel({
         <div className={styles.headerMain}>
           <div className={styles.titleArea}>
             <div className={styles.titleRow}>{titleContent}</div>
-            {/* FORK-REMOVED: sponsor dashboard/registration links */}
+            {/* FORK-REMOVED: sponsor dashboard/registration links (incl. upstream kimi promo) */}
           </div>
           <div className={styles.searchWrap}>
             <span className={styles.searchIcon} aria-hidden="true">

@@ -12,6 +12,7 @@ import { copyToClipboard } from '@/utils/clipboard';
 import { getErrorMessage, isRecord } from '@/utils/helpers';
 import { notifyAuthFilesChanged } from '@/features/authFiles/authFilesEvents';
 import { getPluginTitle, resolvePluginAssetURL } from '@/features/plugins/pluginResources';
+// FORK-REMOVED: Kimi affiliate import
 import type { PluginListEntry } from '@/types';
 import styles from './OAuthPage.module.scss';
 import iconCodex from '@/assets/icons/codex.svg';
@@ -108,7 +109,6 @@ const PROVIDERS: BuiltInOAuthProviderCard[] = [
 const BUILTIN_PROVIDER_IDS = new Set<string>(PROVIDERS.map((provider) => provider.id));
 const CALLBACK_SUPPORTED = new Set<string>(['codex', 'anthropic', 'antigravity', 'xai']);
 const XAI_CALLBACK_URL = 'http://127.0.0.1:56121/callback';
-const KIMI_SIGN_UP_URL = 'https://www.kimi.com/code/?aff=cliproxyapi';
 const SUCCESS_RESET_DELAY_MS = 5000;
 const getProviderI18nPrefix = (provider: string) => provider.replace('-', '_');
 const getAuthKey = (provider: string, suffix: string) =>
@@ -570,9 +570,7 @@ export function OAuthPage() {
 
   const renderOAuthProviderCard = (provider: OAuthProviderCard) => {
     const state = states[provider.id] || {};
-    // FORK-TWEAK: keep Kimi visually consistent with other OAuth cards,
-    // only retain its dedicated sign-up button.
-    const showKimiSignUp = provider.kind === 'builtin' && provider.id === 'kimi';
+    // FORK-REMOVED: Kimi sign-up promo button (affiliate link)
     const canSubmitCallback =
       (provider.kind === 'plugin' || CALLBACK_SUPPORTED.has(provider.id)) && Boolean(state.url);
     const loginButtonLabel =
@@ -597,22 +595,9 @@ export function OAuthPage() {
           </span>
         }
         extra={
-          showKimiSignUp ? (
-            <div className={styles.featuredActions}>
-              <Button
-                onClick={() => window.open(KIMI_SIGN_UP_URL, '_blank', 'noopener,noreferrer')}
-              >
-                {t('auth_login.kimi_sign_up_button')}
-              </Button>
-              <Button onClick={() => startAuth(provider.id)} loading={state.polling}>
-                {loginButtonLabel}
-              </Button>
-            </div>
-          ) : (
-            <Button onClick={() => startAuth(provider.id)} loading={state.polling}>
-              {loginButtonLabel}
-            </Button>
-          )
+          <Button onClick={() => startAuth(provider.id)} loading={state.polling}>
+            {loginButtonLabel}
+          </Button>
         }
       >
         <div className={styles.cardContent}>
